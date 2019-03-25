@@ -15,6 +15,28 @@ client = etcd.Client(host=etcd_host, port=etcd_port)
 today = str(datetime.datetime.today().year) + "-" + str(datetime.datetime.today().month) + "-" + str(datetime.datetime.today().day)
 
 
+def write(key,value):
+    client.set(key, value)
+
+
+def list(key):
+    directory = client.get(key)
+    for result in directory.children:
+        print(result.key)
+
+
+def get(key):
+    return client.get(key).value
+
+
+def clonetool(repo, tool):
+    try:
+        git.Repo.clone_from(repo, importdir + "/" + tool)
+    except:
+        print("Error cloning data")
+        return
+
+
 def sync():
     # Push to github repo
     repo = git.Repo(workdir)
@@ -64,7 +86,7 @@ def retrieve():
     answer = str(input("Clone " + value + " to " + importdir + "?[y/n]"))
     if answer == 'y':
         try:
-            git.Repo.clone_from(value, importdir)
+            git.Repo.clone_from(value, importdir + "/" + dir + date + operator)
         except:
             print("Error cloning data")
             return
