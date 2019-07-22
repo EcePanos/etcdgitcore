@@ -1,0 +1,17 @@
+Programs:
+- Name: 'Demo project'
+  Description: 'Sample project to demonstrate the mao execution format.'
+  Datadir: 'hello_world'
+  Datarepo: '/EcePanos/hello_world_data'
+  Installer:
+    Command: 'sh'
+    Script: 'install.sh'
+  Commands:
+  - Name: 'Run'
+    Description: 'Run the program'
+    Command: 'sh'
+    Script: 'run.sh'
+    Arguments:
+      - Name: 'Message'
+        Description: 'Message to be printed'
+  Path: .
