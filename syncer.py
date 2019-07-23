@@ -42,13 +42,11 @@ def clonetool(repo, tool):
 
 
 def sync():
-
-    # TODO: Run tool and copy contents of its datatir to the local repository
-    # TODO: Then sync it as before
-    # Push to github repo
+    # Run tool
     info = mao_runner.run_program()
     copy_tree("{}/{}/{}".format(importdir, info[0], info[1]),
               "{}/{}".format(importdir, info[0] + "_data"))
+    # Push to github repo
     repo = git.Repo("{}/{}".format(importdir, info[0] + "_data"))
     hub = str(input("Which microservice repository?"))
     try:
