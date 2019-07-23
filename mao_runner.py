@@ -15,13 +15,14 @@ def install_program(path):
         data = yaml.load(stream)
     print(data['Name'])
     print(data['Description'])
-    subprocess.run(data['Installer']['Command'] + ' ' + data['Installer']['Script'], shell=True)
+    subprocess.run("{} {}/{}".format(data['Installer']['Command'],path,data['Installer']['Script']), shell=True)
     data['Path'] = path
     with open ("local.yml",'r') as stream:
         local = yaml.load(stream)
         local['Programs'].append(data)
     with open ('local.yml', 'w') as stream:
         yaml.dump(local, stream)
+    return data['Datarepo']
 
 
 def run_program():
@@ -35,14 +36,17 @@ def run_program():
         print("{}. {}: {}".format(n+1,command['Name'],command['Description']))
     com = int(input("\nYour choice: ")) - 1
     arguments = []
-    for argument in local['Programs'][prog]['Commands'][com]['Arguments']:
-        arguments.append(str(input("{}: {}: ".format(argument['Name'], argument['Description']))))
+    if 'Arguments' in local['Programs'][prog]['Commands'][com]:
+        for argument in local['Programs'][prog]['Commands'][com]['Arguments']:
+            arguments.append(str(input("{}: {}: ".format(argument['Name'], argument['Description']))))
     command_string = "{} {}/{}".format(local['Programs'][prog]['Commands'][com]['Command'],
                                        local['Programs'][prog]['Path'],
                                        local['Programs'][prog]['Commands'][com]['Script'])
+
     for argument in arguments:
         command_string += " {}".format(argument)
     subprocess.run(command_string, shell=True)
+    return [local['Programs'][prog]['Name'], local['Programs'][prog]['Datadir']]
 
 
 if __name__ == '__main__':

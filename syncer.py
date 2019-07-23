@@ -2,6 +2,8 @@ import etcd
 import git
 import datetime
 import configparser
+import mao_runner
+from distutils.dir_util import copy_tree
 
 
 config = configparser.ConfigParser()
@@ -32,14 +34,22 @@ def get(key):
 def clonetool(repo, tool):
     try:
         git.Repo.clone_from(repo, importdir + "/" + tool)
+        datarepo = mao_runner.install_program(importdir + "/" + tool)
+        git.Repo.clone_from(datarepo, importdir + "/" + tool + "_data")
     except:
         print("Error cloning data")
         return
 
 
 def sync():
+
+    # TODO: Run tool and copy contents of its datatir to the local repository
+    # TODO: Then sync it as before
     # Push to github repo
-    repo = git.Repo(workdir)
+    info = mao_runner.run_program()
+    copy_tree("{}/{}/{}".format(importdir, info[0], info[1]),
+              "{}/{}".format(importdir, info[0] + "_data"))
+    repo = git.Repo("{}/{}".format(importdir, info[0] + "_data"))
     hub = str(input("Which microservice repository?"))
     try:
         repo.git.add('.')
