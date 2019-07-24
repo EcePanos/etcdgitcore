@@ -1,24 +1,27 @@
 Programs:
-- Name: 'Hello'
-  Description: 'Sample project to demonstrate the mao execution format.'
-  Datadir: 'hello_world'
-  Datarepo: 'https://github.com/EcePanos/hello-world-data'
+- Name: 'sar'
+  Description: 'SAR metadata collector'
+  Data:
+    Local: 'sar_data'
+    Repo:
+      Name: 'sar-static-data'
+      Remote: 'https://github.com/EcePanos/sar-static-data'
   Installer:
     Command: 'bash'
     Script: 'install.sh'
   Commands:
   - Name: 'Run'
-    Description: 'Run the program'
-    Command: 'bash'
-    Script: 'run.sh'
-    Arguments:
-    - Name: 'Message'
-      Description: 'Message to be printed'
-  Path: /home/panos/clonetest/Hello
+    Description: 'Generate metadata csv'
+    Command: 'python3'
+    Script: 'autocontents.py'
+  Path: /home/panos/clonetest/sar
 - Name: 'sar'
   Description: 'SAR metadata collector'
-  Datadir: 'sar_data'
-  Datarepo: 'https://github.com/EcePanos/sar-static-data'
+  Data:
+    Local: 'sar_data'
+    Repo:
+      Name: 'sar-static-data'
+      Remote: 'https://github.com/EcePanos/sar-static-data'
   Installer:
     Command: 'bash'
     Script: 'install.sh'

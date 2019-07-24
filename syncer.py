@@ -32,13 +32,13 @@ def get(key):
 
 
 def clonetool(repo, tool):
-    try:
-        git.Repo.clone_from(repo, importdir + "/" + tool)
-        datarepo = mao_runner.install_program(importdir + "/" + tool)
-        git.Repo.clone_from(datarepo, importdir + "/" + tool + "_data")
-    except:
-        print("Error cloning data")
-        return
+    #try:
+    git.Repo.clone_from(repo, importdir + "/" + tool)
+    datarepo = mao_runner.install_program(importdir + "/" + tool)
+    git.Repo.clone_from(datarepo, importdir + "/" + tool + "_data")
+    #except:
+        #print("Error cloning data")
+        #return
 
 
 def sync():
@@ -59,8 +59,8 @@ def sync():
         return
     # Write etcd entry
     try:
-        client.set(('/'+ hub + '/' + today + '/' + user), repo.remotes.origin.url)
-        print(client.get('/'+ hub + '/' + today + '/' + user).value)
+        client.set(('/data/' + info[2]), repo.remotes.origin.url)
+        print(client.get('/data/' + info[2]).value)
     except:
         print("Error updating etcd")
         return

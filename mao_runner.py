@@ -35,7 +35,7 @@ def install_program(path):
         local['Programs'].append(data)
     with open ('local.yml', 'w') as stream:
         yaml.dump(local, stream)
-    return data['Datarepo']
+    return data['Data']['Repo']['Remote']
 
 
 def run_program():
@@ -60,7 +60,9 @@ def run_program():
         command_string += " {}".format(argument)
     with cd(local['Programs'][prog]['Path']):
         subprocess.run(command_string, shell=True)
-    return [local['Programs'][prog]['Name'], local['Programs'][prog]['Datadir']]
+    return [local['Programs'][prog]['Name'],
+            local['Programs'][prog]['Data']['Local'],
+            local['Programs'][prog]['Data']['Repo']['Name']]
 
 
 if __name__ == '__main__':
