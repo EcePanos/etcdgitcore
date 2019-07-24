@@ -1,5 +1,6 @@
-# etcd-git-sync
-Core software components of the etcd managed git environment.
+# Research Orbservatory Framework Launcher Manager And Orchestrator
+
+Core software components of the MAO-MAO framework.
 
 ## Installation
  - Install and configure etcd **(real etcd cluster not tested yet)**
