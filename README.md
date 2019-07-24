@@ -39,9 +39,9 @@ In retrieve mode the program will ask you which hub you are interested in, then 
 
 #### Compare data
 
-This mode allows you to choose from files in your workdir and compare them, to see the changes between two snapshots of a data stream. So far it only supports files in .csv format.
+This mode allows you to choose from files in your workdir and compare them, to see the changes between two snapshots of a data stream. So far it only supports files in .csv format and does not search the directory recursively.
 
 ## Roadmap
 
 - **Self-setup**: Discover and join the etcd cluster from within the Launcher.
-- **Daemonisation**: The launcher will be Daemonized and exposed via a CLI in order to support running cronjobs or event-driven execution of experiments.
+- **Interface**: The interface will be redesigned to run as a server/daemon and to support running cronjobs or event-driven execution of experiments.

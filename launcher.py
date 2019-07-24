@@ -19,15 +19,22 @@ def downloadtool():
 
 if __name__ == '__main__':
     print("Welcome to the MAO-MAO Launcher")
-    print("Current Features:")
+    print("Actions:")
     print("[1]Update the database with a new tool")
     print("[2]Install an existing tool")
     print("[3]Run a tool and generate data")
     print("[4]Search and retrieve data from the cluster")
     print("[5] Compare cloned data snapshots")
-    print("[0]Quit(not really a feature)")
+    print("[0]Quit")
 
     while True:
+        print("Actions:")
+        print("[1]Update the database with a new tool")
+        print("[2]Install an existing tool")
+        print("[3]Run a tool and generate data")
+        print("[4]Search and retrieve data from the cluster")
+        print("[5] Compare cloned data snapshots")
+        print("[0]Quit")
         mode = str(input("What would you like to do?"))
         if mode == '1':
             registertool()

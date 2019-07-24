@@ -1,11 +1,23 @@
 import sys
 from ruamel.yaml import YAML
 import subprocess
+from contextlib import contextmanager
+import os
 
 
 output={}
 yaml = YAML()
 yaml.preserve_quotes = True
+
+
+@contextmanager
+def cd(newdir):
+    prevdir = os.getcwd()
+    os.chdir(os.path.expanduser(newdir))
+    try:
+        yield
+    finally:
+        os.chdir(prevdir)
 
 
 def install_program(path):
@@ -15,7 +27,8 @@ def install_program(path):
         data = yaml.load(stream)
     print(data['Name'])
     print(data['Description'])
-    subprocess.run("{} {}/{}".format(data['Installer']['Command'],path,data['Installer']['Script']), shell=True)
+    with cd(path):
+        subprocess.run("{} {}/{}".format(data['Installer']['Command'],path,data['Installer']['Script']), shell=True)
     data['Path'] = path
     with open ("local.yml",'r') as stream:
         local = yaml.load(stream)
@@ -45,7 +58,8 @@ def run_program():
 
     for argument in arguments:
         command_string += " {}".format(argument)
-    subprocess.run(command_string, shell=True)
+    with cd(local['Programs'][prog]['Path']):
+        subprocess.run(command_string, shell=True)
     return [local['Programs'][prog]['Name'], local['Programs'][prog]['Datadir']]
 
 
