@@ -5,23 +5,7 @@ Programs:
     Local: 'sar_data'
     Repo:
       Name: 'sar-static-data'
-      Remote: 'https://github.com/EcePanos/sar-static-data'
-  Installer:
-    Command: 'bash'
-    Script: 'install.sh'
-  Commands:
-  - Name: 'Run'
-    Description: 'Generate metadata csv'
-    Command: 'python3'
-    Script: 'autocontents.py'
-  Path: /home/panos/clonetest/sar
-- Name: 'sar'
-  Description: 'SAR metadata collector'
-  Data:
-    Local: 'sar_data'
-    Repo:
-      Name: 'sar-static-data'
-      Remote: 'https://github.com/EcePanos/sar-static-data'
+      Remote: 'git@github.com:EcePanos/sar-static-data.git'
   Installer:
     Command: 'bash'
     Script: 'install.sh'

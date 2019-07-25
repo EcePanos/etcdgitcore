@@ -1,11 +1,11 @@
+from flask import Flask, request, json, jsonify
 import syncer
-import analyser
+from ruamel.yaml import YAML
 
 
-def registertool():
-    name = str(input("Name of tool?"))
-    repo = str(input("Github link:"))
-    syncer.write("tools/{}".format(name),repo)
+app = Flask(__name__)
+yaml = YAML()
+yaml.preserve_quotes = True
 
 
 def downloadtool():
@@ -17,41 +17,67 @@ def downloadtool():
     if answer == 'y':
         syncer.clonetool(repo, tool)
 
-if __name__ == '__main__':
-    print("Welcome to the MAO-MAO Launcher")
-    print("Actions:")
-    print("[1]Update the database with a new tool")
-    print("[2]Install an existing tool")
-    print("[3]Run a tool and generate data")
-    print("[4]Search and retrieve data from the cluster")
-    print("[5] Compare cloned data snapshots")
-    print("[0]Quit")
 
-    while True:
-        print("Actions:")
-        print("[1]Update the database with a new tool")
-        print("[2]Install an existing tool")
-        print("[3]Run a tool and generate data")
-        print("[4]Search and retrieve data from the cluster")
-        print("[5] Compare cloned data snapshots")
-        print("[0]Quit")
-        mode = str(input("What would you like to do?"))
-        if mode == '1':
-            registertool()
-        elif mode == '2':
-            downloadtool()
-        elif mode == '3':
-            syncer.sync()
-        elif mode == '4':
-            syncer.retrieve()
-        elif mode == '5':
-            analyser.list()
-            file1 = str(input("First file:"))
-            file2 = str(input("Second file:"))
-            analyser.compare(file1, file2)
-        elif mode == '0':
-            quit = str(input("Are you sure? [y/n]"))
-            if quit == 'y':
-                break
-        else:
-            print("Sorry, didn't catch that.")
+@app.route('/regtools', methods=['GET'])
+def regtools():
+    return jsonify(syncer.list('tools'))
+
+
+@app.route('/datasets', methods=['GET'])
+def datasets():
+    return jsonify(syncer.list('data'))
+
+
+@app.route('/installed', methods=['GET'])
+def installed():
+    with open('local.yml', 'r') as local:
+        data = yaml.load(local)
+    result = []
+    for program in data['Programs']:
+        result.append(program['Name'])
+    return jsonify(result)
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = json.loads(request.data)
+    syncer.write("tools/{}".format(data['name']), data['url'])
+    return jsonify(syncer.get("tools/{}".format(data['name'])))
+
+
+@app.route('/install', methods=['POST'])
+def install():
+    data = json.loads(request.data)
+    repo = syncer.get("tools/" + data['name'])
+    syncer.clonetool(repo, data['name'])
+    return installed()
+
+
+@app.route('/help', methods=['POST'])
+def help():
+    query = json.loads(request.data)
+    with open('local.yml', 'r') as local:
+        data = yaml.load(local)
+    for program in data['Programs']:
+        if program['Name'] == (query['name']):
+            return jsonify(program['Commands'])
+    else:
+        return jsonify("No such program")
+
+
+@app.route('/retrieve', methods=['POST'])
+def retrieve():
+    data = json.loads(request.data)
+    syncer.retrieve(data['name'])
+    return jsonify("Done")
+
+
+@app.route("/run", methods=['POST'])
+def run():
+    data = json.loads(request.data)
+    syncer.sync(data)
+    return jsonify("Done")
+
+
+if __name__ == '__main__':
+    app.run()

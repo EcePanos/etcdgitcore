@@ -8,8 +8,6 @@ from distutils.dir_util import copy_tree
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-workdir = config['WORKING_ENVIRONMENT']['WORKDIR']
-user = config['WORKING_ENVIRONMENT']['OPERATOR']
 importdir = config['WORKING_ENVIRONMENT']['IMPORTDIR']
 etcd_host = config['ETCD']['HOST']
 etcd_port = int(config['ETCD']['PORT'])
@@ -23,8 +21,10 @@ def write(key,value):
 
 def list(key):
     directory = client.get(key)
+    qresult = []
     for result in directory.children:
-        print(result.key)
+        qresult.append(result.key)
+    return qresult
 
 
 def get(key):
@@ -32,23 +32,22 @@ def get(key):
 
 
 def clonetool(repo, tool):
-    #try:
-    git.Repo.clone_from(repo, importdir + "/" + tool)
-    datarepo = mao_runner.install_program(importdir + "/" + tool)
-    git.Repo.clone_from(datarepo, importdir + "/" + tool + "_data")
-    #except:
-        #print("Error cloning data")
-        #return
+    try:
+        git.Repo.clone_from(repo, importdir + "/" + tool)
+        datarepo = mao_runner.install_program(importdir + "/" + tool)
+        git.Repo.clone_from(datarepo, importdir + "/" + tool + "_data")
+    except:
+        print("Error cloning data")
+        return
 
 
-def sync():
+def sync(data):
     # Run tool
-    info = mao_runner.run_program()
+    info = mao_runner.run_program(data)
     copy_tree("{}/{}/{}".format(importdir, info[0], info[1]),
               "{}/{}".format(importdir, info[0] + "_data"))
     # Push to github repo
     repo = git.Repo("{}/{}".format(importdir, info[0] + "_data"))
-    hub = str(input("Which microservice repository?"))
     try:
         repo.git.add('.')
         repo.index.commit("sync " + today)
@@ -66,38 +65,18 @@ def sync():
         return
 
 
-def retrieve():
-    dir = str(input("Which microservice repository?"))
+def retrieve(name):
     try:
-        directory = client.get("/" + dir)
-        # loop through directory children
-        for result in directory.children:
-            print(result.key)
+        value = client.get("/data/" + name).value
     except:
         print("No such entry")
         return
-    date = str(input("Which date?"))
     try:
-        directory = client.get("/" + dir + "/" + date)
-        # loop through directory children
-        for result in directory.children:
-            print(result.key)
+        git.Repo.clone_from(value, importdir + "/" + name)
     except:
-        print("No such entry")
+        print("Error cloning data")
         return
-    operator = str(input("Which operator?"))
-    try:
-        value = client.get("/" + dir + "/" + date + "/" + operator).value
-    except:
-        print("No such entry")
-        return
-    answer = str(input("Clone " + value + " to " + importdir + "?[y/n]"))
-    if answer == 'y':
-        try:
-            git.Repo.clone_from(value, importdir + "/" + dir + date + operator)
-        except:
-            print("Error cloning data")
-            return
+
 
 if __name__ == '__main__':
     print("Etcd-Git Sync:")
